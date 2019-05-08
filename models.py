@@ -1,10 +1,6 @@
 from peewee import *
 
-database = PostgresqlDatabase('zavrsni', **{
-    'user': 'postgres',
-    'password': 'postgres',
-    #'host': '/tmp/'
-})
+database = PostgresqlDatabase('zavrsni', **{'user': 'postgres'})
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
@@ -72,7 +68,7 @@ class Submission(BaseModel):
     result = IntegerField(null=True)
     task = ForeignKeyField(column_name='task_id', field='id', model=Task)
     time = DateTimeField()
-    user = ForeignKeyField(backref='task_user_set', column_name='user_id', field='id', model=Task)
+    user = ForeignKeyField(column_name='user_id', field='id', model=User, null=True)
 
     class Meta:
         table_name = 'submission'
@@ -87,6 +83,7 @@ class Test(BaseModel):
 
 class TestResult(BaseModel):
     points = IntegerField(null=True)
+    stderr = TextField(null=True)
     submission = ForeignKeyField(column_name='submission_id', field='id', model=Submission)
     test = ForeignKeyField(column_name='test_id', field='id', model=Test)
 

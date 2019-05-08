@@ -157,11 +157,11 @@ ALTER TABLE public.participates_in OWNER TO postgres;
 
 CREATE TABLE public.submission (
     task_id integer NOT NULL,
-    user_id integer NOT NULL,
     "time" timestamp without time zone NOT NULL,
     language integer NOT NULL,
     result integer,
-    id integer NOT NULL
+    id integer NOT NULL,
+    user_id integer
 );
 
 
@@ -271,7 +271,8 @@ ALTER SEQUENCE public.test_id_seq OWNED BY public.test.id;
 CREATE TABLE public.test_result (
     test_id integer NOT NULL,
     submission_id integer NOT NULL,
-    points integer
+    points integer,
+    stderr text
 );
 
 
@@ -324,6 +325,7 @@ ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.koris
 --
 
 COPY public.competition (id, start_time, end_time, public) FROM stdin;
+1	2019-01-01 08:30:00	2019-01-01 11:30:00	t
 \.
 
 
@@ -332,6 +334,8 @@ COPY public.competition (id, start_time, end_time, public) FROM stdin;
 --
 
 COPY public.contains (task_id, competition_id) FROM stdin;
+1	1
+2	1
 \.
 
 
@@ -340,6 +344,10 @@ COPY public.contains (task_id, competition_id) FROM stdin;
 --
 
 COPY public.language (id, name, version) FROM stdin;
+1	python	2.7
+2	python	3.7
+3	c	nesto
+4	c++	11
 \.
 
 
@@ -348,6 +356,8 @@ COPY public.language (id, name, version) FROM stdin;
 --
 
 COPY public.participates_in (user_id, competition_id) FROM stdin;
+5	1
+4	1
 \.
 
 
@@ -355,7 +365,8 @@ COPY public.participates_in (user_id, competition_id) FROM stdin;
 -- Data for Name: submission; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.submission (task_id, user_id, "time", language, result, id) FROM stdin;
+COPY public.submission (task_id, "time", language, result, id, user_id) FROM stdin;
+1	2019-01-01 09:00:00	1	\N	3	5
 \.
 
 
@@ -364,6 +375,8 @@ COPY public.submission (task_id, user_id, "time", language, result, id) FROM std
 --
 
 COPY public.task (id, text, title, maxpoints, public, time_limit_ms, memory_limit_kb) FROM stdin;
+1	put/do/text.md	lagan	10	t	\N	\N
+2	put/do/text2.md	tezak	50	f	\N	\N
 \.
 
 
@@ -372,6 +385,11 @@ COPY public.task (id, text, title, maxpoints, public, time_limit_ms, memory_limi
 --
 
 COPY public.test (input, output, task, id) FROM stdin;
+/path/to/input	/path/to/outpu	1	1
+/path/to/input2	/path/to/output2	1	2
+/path/to/input1	/path/to/output1	2	3
+/path/to/input2	/path/to/output2	2	4
+/path/to/input3	/path/to/output3	2	5
 \.
 
 
@@ -379,7 +397,7 @@ COPY public.test (input, output, task, id) FROM stdin;
 -- Data for Name: test_result; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.test_result (test_id, submission_id, points) FROM stdin;
+COPY public.test_result (test_id, submission_id, points, stderr) FROM stdin;
 \.
 
 
@@ -388,6 +406,10 @@ COPY public.test_result (test_id, submission_id, points) FROM stdin;
 --
 
 COPY public."user" (id, username, password_hash, email, admin) FROM stdin;
+1	pero	\N	a@b.c	f
+3	kreso	\N	d@e.f	f
+4	ana	test	g@h.i	f
+5	Ivan	hash	j@k.l	t
 \.
 
 
@@ -395,42 +417,42 @@ COPY public."user" (id, username, password_hash, email, admin) FROM stdin;
 -- Name: competition_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.competition_id_seq', 1, false);
+SELECT pg_catalog.setval('public.competition_id_seq', 1, true);
 
 
 --
 -- Name: korisnik_pk_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.korisnik_pk_seq', 1, false);
+SELECT pg_catalog.setval('public.korisnik_pk_seq', 5, true);
 
 
 --
 -- Name: language_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.language_id_seq', 1, false);
+SELECT pg_catalog.setval('public.language_id_seq', 4, true);
 
 
 --
 -- Name: submission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.submission_id_seq', 1, false);
+SELECT pg_catalog.setval('public.submission_id_seq', 3, true);
 
 
 --
 -- Name: task_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.task_id_seq', 1, false);
+SELECT pg_catalog.setval('public.task_id_seq', 2, true);
 
 
 --
 -- Name: test_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.test_id_seq', 1, false);
+SELECT pg_catalog.setval('public.test_id_seq', 5, true);
 
 
 --
@@ -566,7 +588,7 @@ ALTER TABLE ONLY public.submission
 --
 
 ALTER TABLE ONLY public.submission
-    ADD CONSTRAINT submission_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.task(id);
+    ADD CONSTRAINT submission_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id);
 
 
 --
