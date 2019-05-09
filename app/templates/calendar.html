@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>Calendar</div>
+    {% for competition in competitions %}
+	{{ competition.name }}
+    {% endfor %}
+{% endblock content %}
