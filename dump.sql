@@ -27,7 +27,8 @@ CREATE TABLE public.competition (
     id integer NOT NULL,
     start_time timestamp without time zone,
     end_time timestamp without time zone,
-    public boolean NOT NULL
+    public boolean NOT NULL,
+    name text NOT NULL
 );
 
 
@@ -324,8 +325,8 @@ ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.koris
 -- Data for Name: competition; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.competition (id, start_time, end_time, public) FROM stdin;
-1	2019-01-01 08:30:00	2019-01-01 11:30:00	t
+COPY public.competition (id, start_time, end_time, public, name) FROM stdin;
+1	2019-01-01 08:30:00	2019-01-01 11:30:00	t	kreativno ime
 \.
 
 
