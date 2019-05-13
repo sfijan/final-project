@@ -1,6 +1,10 @@
 from peewee import *
+from webapp import database, login_manager
+from flask_login import UserMixin
 
-database = PostgresqlDatabase('zavrsni', **{'user': 'postgres'})
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(int(user_id))
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass
@@ -47,7 +51,7 @@ class Language(BaseModel):
     class Meta:
         table_name = 'language'
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     admin = BooleanField(null=True)
     email = CharField(unique=True)
     password_hash = CharField(null=True)

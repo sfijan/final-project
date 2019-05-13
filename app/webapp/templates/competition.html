@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ competition.name }}</h1>
+    <br>
+    <table class="table">
+	<thead>
+	    <tr>
+		<th>Task name</th>
+		<th>Maximum points</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for t in Contains.select().where(Contains.competition == competition.id) %}
+		<tr>
+		    <td><a href="{{ url_for('display_task', task_id=t.task.id) }}">{{ t.task.title }}</a></td>
+		    <td>{{ t.task.maxpoints }}</td>
+		</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+{% endblock content %}

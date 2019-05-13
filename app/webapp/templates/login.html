@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content-section mx-auto" style="width: 400px;">
+	<form method="POST" action="">
+	    {{ form.hidden_tag() }}
+	    <fieldset>
+		<legend>Log in</legend>
+		<div>
+		    {{ form.username.label() }}
+		    <br>
+		    {{ form.username(class='form-control') }}
+		    {% if form.username.errors %}
+			{% for error in form.username.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+		<div>
+		    {{ form.password.label() }}
+		    <br>
+		    {{ form.password(class='form-control') }}
+		    {% if form.password.errors %}
+			<div>
+			    {% for error in form.password.errors %}
+				<span class="form-text text-muted">{{ error }}</span>
+			    {% endfor %}
+			</div>
+		    {% endif %}
+		    <br>
+		</div>
+	    </fieldset>
+	    <div>
+		{{ form.submit(class='btn, btn-primary') }}
+	    </div>
+	</form>
+    </div>
+{% endblock content %}

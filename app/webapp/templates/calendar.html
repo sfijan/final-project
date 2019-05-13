@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Calendar</h1>
+    <br>
+    <table class="table">
+	<thead>
+	    <tr>
+		<th>Name</th>
+		<th>Start time</th>
+		<th>End time</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for competition in competitions %}
+		{% if competition.public %}
+		    <tr>
+			<th><a href="{{ url_for('display_competition', competition_id=competition.id) }}">{{ competition.name }}</a></th>
+			<th>{{ competition.start_time }}</th>
+			<th>{{ competition.end_time }}</th>
+		    </tr>
+		{% endif %}
+	    {% endfor %}
+	</tbody>
+    </table>
+{% endblock content %}

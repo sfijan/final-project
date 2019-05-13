@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content-section">
+	<form method="POST" action="">
+	    {{ form.hidden_tag() }}
+	    <fieldset>
+		<legend>Add a new task</legend>
+		<div>
+		    {{ form.title.label() }}
+		    <br>
+		    {{ form.title(class='form-control') }}
+		    {% if form.title.errors %}
+			{% for error in form.title.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+		<!-- TODO dodat ostatak za task -->
+	    </fieldset>
+	    <div>
+		{{ form.submit(class='btn btn-primary') }}
+	    </div>
+	</form>
+    </div>
+{% endblock content %}

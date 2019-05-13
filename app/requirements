@@ -1,3 +1,6 @@
 flask
 peewee
 psycopg2
+flask-wtf
+flask-bcrypt
+flask-login
