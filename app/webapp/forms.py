@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, DateTimeField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
-from webapp.models import *
+#from webapp.models import *
 
 
 class RegistrationForm(FlaskForm):
@@ -33,7 +33,6 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Log in')
 
 
-'''
 class TaskAddForm(FlaskForm):
     title = StringField('Task title',
                        validators=[DataRequired(), Length(min=1, max=64)])
@@ -41,14 +40,13 @@ class TaskAddForm(FlaskForm):
     text = FileField('File with task text', validators=[FileAllowed(['pdf', 'txt', ''])])
     public = BooleanField('Public')
     submit = SubmitField('Add task')
-'''
 
 
 class CompetitionAddForm(FlaskForm):
     name = StringField('Competition name',
                        validators=[DataRequired(), Length(min=1, max=64)])
-    start_time = DateTimeField('Start time', [DataRequired()])
-    end_time = DateTimeField('End time', [DataRequired()])
+    start_time = DateTimeField('Start time', validators=[DataRequired()])
+    end_time = DateTimeField('End time', validators=[DataRequired()])
     public = BooleanField('Public')
     submit = SubmitField('Add competition')
 
