@@ -18,7 +18,7 @@ def calendar():
     return render_template('calendar.html', title='calendar', competitions=competitions, current_user=current_user)
 
 
-@app.route('/competition/<competition_id>', methods=['GET', 'POST'])
+@app.route('/competition/<competition_id>', methods=['GET', 'POST'])        #TODO timer, points
 def display_competition(competition_id):
     competition = Competition.get(int(competition_id))
     return render_template('competition.html', title=competition.name, competition=competition, Contains=Contains)
@@ -78,7 +78,7 @@ def add_task():
 
 
 @app.route('/task/<task_id>')
-def display_task(task_id):
+def display_task(task_id):      #TODO task submission
     selected_task = Task.get(int(task_id))
     return render_template('view_task.html', title=selected_task.title, task=selected_task, file=selected_task.text)
 
