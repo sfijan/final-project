@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ task.title }}</h1>
+    <br>
+    <!-- TODO  -->
+    <div>The task is worth {{ task.maxpoints }} points.</div>
+    <form method="get" action="/{{ file }}">
+	<button type="submit" class="btn btn-primary">Download task file</button>
+    </form>
+{% endblock content %}

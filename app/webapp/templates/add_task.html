@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="content-section">
-	<form method="POST" action="">
+	<form method="POST" action="" enctype="multipart/form-data">
 	    {{ form.hidden_tag() }}
 	    <fieldset>
 		<legend>Add a new task</legend>
@@ -14,10 +14,36 @@
 			    <small class="form-text text-muted">{{ error }}</small>
 			{% endfor %}
 		    {% endif %}
-		    <br>
 		</div>
-		<!-- TODO dodat ostatak za task -->
+		<br>
+		<div>
+		    {{ form.text.label() }}
+		    {{ form.text(class='form-control-file') }}
+		    {% if form.text.errors %}
+			{% for error in form.text.errors %}
+			    <small class="form-text text-muted">{{ error }}</small><br>
+			{% endfor %}
+		    {% endif %}
+		</div>
+		<br>
+		<div>
+		    {{ form.maxpoints.label() }}
+		    <br>
+		    {{ form.maxpoints(class='form-control') }}
+		    {% if form.maxpoints.errors %}
+			{% for error in form.maxpoints.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		</div>
+		<br>
+		<div>
+		    {{ form.public.label() }}
+		    {{ form.public() }}
+		</div>
+		<!-- TODO doradit -->
 	    </fieldset>
+	    <br>
 	    <div>
 		{{ form.submit(class='btn btn-primary') }}
 	    </div>

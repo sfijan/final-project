@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>All available tasks:</h1>
+    <br>
+    <!-- TODO  -->
+    <table class="table">
+	<thead>
+	    <tr>
+		<th>Task name</th>
+		<th>Maximum points</th>
+		{% if current_user.admin %}
+		    <th>Public</th>
+		{% endif  %}
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for t in Task.select().where(current_user.admin >= Task.public) %}
+		<tr>
+		    <td><a href="{{ url_for('display_task', task_id=t.id) }}">{{ t.title }}</a></td>
+		    <td>{{ t.maxpoints }}</td>
+		    {% if current_user.admin %}
+			<td>{{ t.public }}</td>
+		    {% endif  %}
+		</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    {% if current_user.admin %}
+	<a class="btn btn-primary" href="{{ url_for('add_task') }}" role="button">Add new task</a>
+    {% endif %}
+{% endblock content %}

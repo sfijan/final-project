@@ -10,7 +10,7 @@
 		    <br>
 		    {{ form.name(class='form-control') }}
 		    {% if form.name.errors %}
-			{% for error in form.username.errors %}
+			{% for error in form.name.errors %}
 			    <small class="form-text text-muted">{{ error }}</small>
 			{% endfor %}
 		    {% endif %}
@@ -22,6 +22,38 @@
 		    {{ form.start_time(class='form-control') }}
 		    {% if form.start_time.errors %}
 			{% for error in form.start_time.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+		<div>
+		    {{ form.end_time.label() }}
+		    <br>
+		    {{ form.end_time(class='form-control') }}
+		    {% if form.end_time.errors %}
+			{% for error in form.end_time.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+		<div>
+		    {{ form.tasks.label() }}
+		    <br>
+		    {{ form.tasks(class='form-control') }}
+		    {% if form.tasks.errors %}
+			{% for error in form.tasks.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+		<div>
+		    {{ form.public.label() }}
+		    {{ form.public() }}
+		    {% if form.public.errors %}
+			{% for error in form.public.errors %}
 			    <small class="form-text text-muted">{{ error }}</small>
 			{% endfor %}
 		    {% endif %}
