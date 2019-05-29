@@ -6,6 +6,7 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.get(int(user_id))
 
+
 class UnknownField(object):
     def __init__(self, *_, **__): pass
 
@@ -46,7 +47,6 @@ class Contains(BaseModel):
 
 class Language(BaseModel):
     name = TextField()
-    version = TextField()
 
     class Meta:
         table_name = 'language'
@@ -69,19 +69,21 @@ class ParticipatesIn(BaseModel):
         primary_key = False
 
 class Submission(BaseModel):
+    code = TextField(null=True)
+    competition = ForeignKeyField(column_name='competition', field='id', model=Competition, null=True)
     language = ForeignKeyField(column_name='language', field='id', model=Language)
     result = IntegerField(null=True)
     task = ForeignKeyField(column_name='task_id', field='id', model=Task)
     time = DateTimeField()
-    user = ForeignKeyField(column_name='user_id', field='id', model=User, null=True)
+    user = ForeignKeyField(column_name='user_id', field='id', model=User)
 
     class Meta:
         table_name = 'submission'
 
 class Test(BaseModel):
-    input = TextField()
-    output = TextField()
     task = ForeignKeyField(column_name='task', field='id', model=Task)
+    test_name = TextField()
+    zip_file = TextField()
 
     class Meta:
         table_name = 'test'
