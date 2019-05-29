@@ -14,9 +14,9 @@
 	    {% for competition in competitions %}
 		{% if competition.public or current_user.admin %}
 		    <tr>
-			<th><a href="{{ url_for('display_competition', competition_id=competition.id) }}">{{ competition.name }}</a></th>
-			<th>{{ competition.start_time }}</th>
-			<th>{{ competition.end_time }}</th>
+			<td><a href="{{ url_for('display_competition', competition_id=competition.id) }}">{{ competition.name }}</a></td>
+			<td>{{ competition.start_time }}</td>
+			<td>{{ competition.end_time }}</td>
 		    </tr>
 		{% endif %}
 	    {% endfor %}
