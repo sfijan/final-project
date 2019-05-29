@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request
-from webapp.forms import RegistrationForm, LoginForm, CompetitionAddForm, TaskAddForm
-from webapp.models import User, Competition, Task, Contains
+from webapp.forms import RegistrationForm, LoginForm, CompetitionAddForm, TaskAddForm, TaskSubmitForm
+from webapp.models import User, Competition, Task, Contains, Submission
 from webapp import app, database, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import *
@@ -36,20 +36,42 @@ def add_competition():
                                   end_time=form.end_time.data,
                                   public=form.public.data)
         competition.save()
-        print(form.tasks.data)
         for task in form.tasks.data:
             contains = Contains(competition=competition.id,
                                 task=int(task)).save()
-        #print(form.tasks.getlist('form'))
         flash('Competition added seccesfully!', 'success')
         return redirect(url_for('calendar'))
-    return render_template('add_competition.html', title='Add competition', form=form)
+    return render_template('add_competition.html', title='Add competition', form=form, action='add')
+
+
+#@app.route('/competition/<competition_id>/edit', methods=['GET', 'POST'])       #TODO
+#def add_competition():
+#    if not (current_user.is_authenticated and current_user.admin):
+#        flash('You do not have admin privilages!', 'danger')
+#        return redirect(url_for('home'))
+#
+#    form = CompetitionAddForm()
+#    if form.validate_on_submit():
+#        competition = Competition(name=form.name.data,
+#                                  start_time=form.start_time.data,
+#                                  end_time=form.end_time.data,
+#                                  public=form.public.data)
+#        competition.save()
+#        for task in form.tasks.data:
+#            contains = Contains(competition=competition.id,
+#                                task=int(task)).save()
+#        flash('Competition added seccesfully!', 'success')
+#        return redirect(url_for('calendar'))
+#    return render_template('add_competition.html', title='Add competition', form=form, action='edit')
 
 
 @app.route('/task')
 def task():
-    tasks = Task.select()
-    return render_template('list_task.html', title='task', Task=Task, current_user=current_user)
+    if current_user and current_user.admin:
+        tasks = Task.select()
+    else:
+        tasks = Task.select().where(Task.public)
+    return render_template('list_task.html', title='task', tasks=tasks, current_user=current_user)
 
 
 def save_text(form):
@@ -58,6 +80,13 @@ def save_text(form):
     route = os.path.join(app.root_path, 'static/task_text', filename)
     form.text.data.save(route)
     return os.path.join('static/task_text', filename)
+
+
+def save_tests(form):
+    filename = form.tests.data.filename.replace(' ', '_')
+    route = os.path.join(app.root_path, 'static/tests', filename)
+    form.tests.data.save(route)
+    return os.path.join('static/tests', filename)
 
 
 @app.route('/task/add', methods=['GET', 'POST'])
@@ -71,16 +100,41 @@ def add_task():
         task = Task(title=form.title.data,
                     text=relative_path,
                     maxpoints=form.maxpoints.data,
-                    public=form.public.data).save()
+                    public=form.public.data)
+        task.save()
+        save_tests(form)
         flash('Task added seccesfully!', 'success')
-        return redirect(url_for('task'))
+        return redirect(url_for('display_task', task_id=task.id))
     return render_template('add_task.html', title='Add task', form=form)
 
 
-@app.route('/task/<task_id>')
-def display_task(task_id):      #TODO task submission
+def save_submission(form, id):
+    _, ext = os.path.splitext(form.code.data.filename)
+    filename = str(id) + ext
+    route = os.path.join(app.root_path, 'static/submission', filename)
+    form.code.data.save(route)
+    return os.path.join('static/submission', filename)
+
+
+@app.route('/competition/<competition_id>/<task_id>', methods=['GET', 'POST'])        #TODO timer, points
+@app.route('/task/<task_id>', defaults={'competition_id':None}, methods=['GET', 'POST'])
+def display_task(task_id, competition_id):      #TODO task submission
     selected_task = Task.get(int(task_id))
-    return render_template('view_task.html', title=selected_task.title, task=selected_task, file=selected_task.text)
+    taskSubmitForm = TaskSubmitForm()
+    if taskSubmitForm.validate_on_submit():
+        submission = Submission(competition=competition_id,
+                                language=taskSubmitForm.language.data,
+                                task=task_id,
+                                time=datetime.now(),
+                                user=current_user.id)
+        submission.save()
+        relative_path = save_submission(taskSubmitForm, submission.id)
+        submission.code = relative_path
+        submission.save(only=[Submission.code])
+
+    if competition_id:
+        competition = Competition.get(int(competition_id))
+    return render_template('view_task.html', title=selected_task.title, task=selected_task, file=selected_task.text, current_user=current_user, taskSubmitForm=taskSubmitForm)
 
 
 @app.route('/register', methods=['GET', 'POST'])
