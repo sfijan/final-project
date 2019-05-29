@@ -2,7 +2,6 @@
 {% block content %}
     <h1>All available tasks:</h1>
     <br>
-    <!-- TODO  -->
     <table class="table">
 	<thead>
 	    <tr>
@@ -14,7 +13,7 @@
 	    </tr>
 	</thead>
 	<tbody>
-	    {% for t in Task.select().where(current_user.admin >= Task.public) %}
+	    {% for t in tasks %}
 		<tr>
 		    <td><a href="{{ url_for('display_task', task_id=t.id) }}">{{ t.title }}</a></td>
 		    <td>{{ t.maxpoints }}</td>
@@ -25,6 +24,7 @@
 	    {% endfor %}
 	</tbody>
     </table>
+    <br>
     {% if current_user.admin %}
 	<a class="btn btn-primary" href="{{ url_for('add_task') }}" role="button">Add new task</a>
     {% endif %}
