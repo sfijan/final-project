@@ -2,9 +2,43 @@
 {% block content %}
     <h1>{{ task.title }}</h1>
     <br>
-    <!-- TODO  -->
+    <!-- TODO make pretty -->
     <div>The task is worth {{ task.maxpoints }} points.</div>
-    <form method="get" action="/{{ file }}">
-	<button type="submit" class="btn btn-primary">Download task file</button>
-    </form>
+    {% if current_user.is_authenticated %}
+	<br>
+	<form method="get" action="/{{ file }}">
+	    <button type="submit" class="btn btn-primary">Download task file</button>
+	</form>
+	<br>
+	<form method="POST" action="" enctype="multipart/form-data">
+	    {{ taskSubmitForm.hidden_tag() }}
+	    <fieldset>
+		<legend>Submit a solution</legend>
+		<div>
+		    {{ taskSubmitForm.code.label() }}
+		    <br>
+		    {{ taskSubmitForm.code(class='taskSubmitForm-control-file') }}
+		    {% if taskSubmitForm.code.errors %}
+			{% for error in taskSubmitForm.code.errors %}
+			    <small class="form-text text-muted">{{ error }}</small><br>
+			{% endfor %}
+		    {% endif %}
+		</div>
+		<br>
+		<div>
+		    {{ taskSubmitForm.language.label() }}
+		    {{ taskSubmitForm.language() }}
+		    {% if taskSubmitForm.language.errors %}
+			{% for error in taskSubmitForm.language.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+	    </fieldset>
+	    <div>
+		{{ taskSubmitForm.submit(class='btn btn-primary') }}
+	    </div>
+	</form>
+    {% endif %}
 {% endblock content %}
