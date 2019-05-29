@@ -1,12 +1,17 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, DateTimeField, BooleanField, IntegerField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, DateTimeField, BooleanField, IntegerField, SelectMultipleField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
-from webapp.models import User, Competition, Task
+from webapp.models import User, Competition, Task, Language
 from datetime import datetime
+import zipfile
 
 
 class NotValidatedSelectMultipleField(SelectMultipleField):
+    def pre_validate(self, form):
+        pass
+
+class NotValidatedSelectField(SelectField):
     def pre_validate(self, form):
         pass
 
@@ -48,15 +53,23 @@ class TaskAddForm(FlaskForm):
                        validators=[DataRequired(), Length(min=1, max=64)])
     text = FileField('File with task text (.pdf or .txt)',
                      validators=[FileAllowed(['pdf', 'txt']), DataRequired()])
-    #TODO fix file
     maxpoints = IntegerField('Maximum points',
                              validators=[DataRequired(), NumberRange(min=1)])
+    tests = FileField('A zip archive of tsts ang expected outputs',
+                      validators=[FileAllowed(['zip']), DataRequired()])
     public = BooleanField('Public')
     submit = SubmitField('Add task')
 
     def validate_title(self, title):
         if Task.select().where(Task.title == title.data).exists():
             raise ValidationError("Task '" + title.data + "' already exist")
+
+    def validate_tests(self, tests):
+        pass            #TODO
+
+
+#class TaskEditForm(TaskAddForm):       #TODO
+#    submit = SubmitField('Update task info')
 
 
 class CompetitionAddForm(FlaskForm):
@@ -79,3 +92,9 @@ class CompetitionAddForm(FlaskForm):
     def validate_name(self, name):
         if Competition.select().where(Competition.name == name.data).exists():
             raise ValidationError("Competition '" + name.data + "' already exist")
+
+class TaskSubmitForm(FlaskForm):
+    code = FileField('Source code', validators=[DataRequired()])
+    language = NotValidatedSelectField('Programming language', choices=[(l.id, l.name) for l in Language.select()], validators=[DataRequired()])
+    submit = SubmitField('Submit solution')
+
