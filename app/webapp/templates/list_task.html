@@ -7,7 +7,7 @@
 	    <tr>
 		<th>Task name</th>
 		<th>Maximum points</th>
-		{% if current_user.admin %}
+		{% if current_user.is_authenticated and current_user.admin %}
 		    <th>Public</th>
 		{% endif  %}
 	    </tr>
@@ -17,7 +17,7 @@
 		<tr>
 		    <td><a href="{{ url_for('display_task', task_id=t.id) }}">{{ t.title }}</a></td>
 		    <td>{{ t.maxpoints }}</td>
-		    {% if current_user.admin %}
+		    {% if current_user.is_authenticated and current_user.admin %}
 			<td>{{ t.public }}</td>
 		    {% endif  %}
 		</tr>
