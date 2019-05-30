@@ -1,13 +1,14 @@
-import zipfile
+from zipfile import ZipFile
 import subprocess
+import os
 
 def evaluate(program, tests):
     #program: name of the program file
     #test: zip archive with the tests
-    z = zipfile.ZipFile(tests)
+    z = ZipFile(tests)
     infiles = []
     outfiles = []
-    correct = []
+    result = []
     files = z.namelist()
     files.sort()
     for file in files:
@@ -20,6 +21,6 @@ def evaluate(program, tests):
     for i in range(len(infiles)):
         submission_output = subprocess.check_output('echo -e "' + infiles[i].read().decode() + '" | python prog.py', shell=True).decode()
         correct_output = outfiles[i].read().decode()
-        correct.append(submission_output.strip(' \n\t') == correct_output.strip(' \n\t'))
+        result.append((os.path.join(os.getcwd(), tests), submission_output.strip(' \n\t') == correct_output.strip(' \n\t')))
 
-    return (correct.count(True), len(correct))
+    return result
