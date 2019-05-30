@@ -1,10 +1,11 @@
 from flask import render_template, url_for, flash, redirect, request
 from webapp.forms import RegistrationForm, LoginForm, CompetitionAddForm, TaskAddForm, TaskSubmitForm
-from webapp.models import User, Competition, Task, Contains, Submission
+from webapp.models import User, Competition, Task, Contains, Submission, Test
 from webapp import app, database, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import *
 import os
+from zipfile import ZipFile
 
 
 @app.route('/')
@@ -67,7 +68,7 @@ def add_competition():
 
 @app.route('/task')
 def task():
-    if current_user and current_user.admin:
+    if current_user.is_authenticated and current_user.admin:
         tasks = Task.select()
     else:
         tasks = Task.select().where(Task.public)
@@ -82,10 +83,18 @@ def save_text(form):
     return os.path.join('static/task_text', filename)
 
 
-def save_tests(form):
+def save_tests(form, task_id):
     filename = form.tests.data.filename.replace(' ', '_')
     route = os.path.join(app.root_path, 'static/tests', filename)
     form.tests.data.save(route)
+    #route = os.path.join('static/tests', filename)
+    zip_tests = ZipFile(route)
+    for file in zip_tests.namelist():
+        if not (file.startswith('out/') or file.endswith('/')):
+            test = Test(task=task_id,
+                        test_name=file.split('/')[1],
+                        zip_file=route)
+            test.save()
     return os.path.join('static/tests', filename)
 
 
@@ -102,7 +111,7 @@ def add_task():
                     maxpoints=form.maxpoints.data,
                     public=form.public.data)
         task.save()
-        save_tests(form)
+        save_tests(form, task.id)
         flash('Task added seccesfully!', 'success')
         return redirect(url_for('display_task', task_id=task.id))
     return render_template('add_task.html', title='Add task', form=form)
