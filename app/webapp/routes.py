@@ -31,6 +31,7 @@ def add_competition():
         flash('You do not have admin privilages!', 'danger')
         return redirect(url_for('home'))
     form = CompetitionAddForm()
+    form.tasks.choices=[(t.id, t.title) for t in Task.select()]
     if form.validate_on_submit():
         competition = Competition(name=form.name.data,
                                   start_time=form.start_time.data,
@@ -127,9 +128,13 @@ def save_submission(form, id):
 
 @app.route('/competition/<competition_id>/<task_id>', methods=['GET', 'POST'])        #TODO timer, points
 @app.route('/task/<task_id>', defaults={'competition_id':None}, methods=['GET', 'POST'])
-def display_task(task_id, competition_id):      #TODO task submission
+def display_task(task_id, competition_id):
     selected_task = Task.get(int(task_id))
+    if not selected_task.public or not (current_user.is_authenticated and current_user.admin):
+        flash('You cannot view that task', 'danger')
+        return redirect(url_for('task'))
     taskSubmitForm = TaskSubmitForm()
+    active = True
     if taskSubmitForm.validate_on_submit():
         submission = Submission(competition=competition_id,
                                 language=taskSubmitForm.language.data,
@@ -140,10 +145,14 @@ def display_task(task_id, competition_id):      #TODO task submission
         relative_path = save_submission(taskSubmitForm, submission.id)
         submission.code = relative_path
         submission.save(only=[Submission.code])
+        #return redirect(url_for(''))
 
     if competition_id:
         competition = Competition.get(int(competition_id))
-    return render_template('view_task.html', title=selected_task.title, task=selected_task, file=selected_task.text, current_user=current_user, taskSubmitForm=taskSubmitForm)
+        if competition.start_time > datetime.now() or competition.end_time < datetime.now():
+            active = False
+
+    return render_template('view_task.html', title=selected_task.title, task=selected_task, file=selected_task.text, current_user=current_user, taskSubmitForm=taskSubmitForm, active=active)
 
 
 @app.route('/register', methods=['GET', 'POST'])

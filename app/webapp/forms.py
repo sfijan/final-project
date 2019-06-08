@@ -78,7 +78,7 @@ class CompetitionAddForm(FlaskForm):
     start_time = DateTimeField('Start time', validators=[DataRequired()], format="%d.%m.%Y %H:%M")
     end_time = DateTimeField('End time', validators=[DataRequired()], format="%d.%m.%Y %H:%M")
     public = BooleanField('Public:')
-    tasks = NotValidatedSelectMultipleField('Tasks', choices=[(t.id, t.title) for t in Task.select()])
+    tasks = NotValidatedSelectMultipleField('Tasks')#, choices=[(t.id, t.title) for t in Task.select()])
     submit = SubmitField('Add competition')
 
     def validate_start_time(self, start_time):

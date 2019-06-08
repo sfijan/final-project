@@ -4,41 +4,47 @@
     <br>
     <!-- TODO make pretty -->
     <div>The task is worth {{ task.maxpoints }} points.</div>
+    <br>
+    <form method="get" action="/{{ file }}">
+	<button type="submit" class="btn btn-primary">Download task file</button>
+    </form>
+    <br>
     {% if current_user.is_authenticated %}
-	<br>
-	<form method="get" action="/{{ file }}">
-	    <button type="submit" class="btn btn-primary">Download task file</button>
-	</form>
-	<br>
-	<form method="POST" action="" enctype="multipart/form-data">
-	    {{ taskSubmitForm.hidden_tag() }}
-	    <fieldset>
-		<legend>Submit a solution</legend>
-		<div>
-		    {{ taskSubmitForm.code.label() }}
-		    <br>
-		    {{ taskSubmitForm.code(class='taskSubmitForm-control-file') }}
-		    {% if taskSubmitForm.code.errors %}
+	{% if active %}
+	    <form method="POST" action="" enctype="multipart/form-data">
+		{{ taskSubmitForm.hidden_tag() }}
+		<fieldset>
+		    <legend>Submit a solution</legend>
+		    <div>
+			{{ taskSubmitForm.code.label() }}
+			<br>
+			{{ taskSubmitForm.code(class='taskSubmitForm-control-file') }}
+			{% if taskSubmitForm.code.errors %}
 			{% for error in taskSubmitForm.code.errors %}
-			    <small class="form-text text-muted">{{ error }}</small><br>
+			<small class="form-text text-muted">{{ error }}</small><br>
 			{% endfor %}
-		    {% endif %}
-		</div>
-		<br>
-		<div>
-		    {{ taskSubmitForm.language.label() }}
-		    {{ taskSubmitForm.language() }}
-		    {% if taskSubmitForm.language.errors %}
-			{% for error in taskSubmitForm.language.errors %}
-			    <small class="form-text text-muted">{{ error }}</small>
-			{% endfor %}
-		    {% endif %}
+			{% endif %}
+		    </div>
 		    <br>
+		    <div>
+			{{ taskSubmitForm.language.label() }}
+			{{ taskSubmitForm.language() }}
+			{% if taskSubmitForm.language.errors %}
+			{% for error in taskSubmitForm.language.errors %}
+			<small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+			{% endif %}
+			<br>
+		    </div>
+		</fieldset>
+		<div>
+		    {{ taskSubmitForm.submit(class='btn btn-primary') }}
 		</div>
-	    </fieldset>
-	    <div>
-		{{ taskSubmitForm.submit(class='btn btn-primary') }}
-	    </div>
-	</form>
+	    </form>
+	{% else %}
+	    <div>Wait for the competition to start to submit code.</div>
+	{% endif %}
+    {% else %}
+	<a href="{{ url_for('login') }}">Log in</a> to submit code.
     {% endif %}
 {% endblock content %}
