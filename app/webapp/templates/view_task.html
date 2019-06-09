@@ -10,40 +10,36 @@
     </form>
     <br>
     {% if current_user.is_authenticated %}
-	{% if active %}
-	    <form method="POST" action="" enctype="multipart/form-data">
-		{{ taskSubmitForm.hidden_tag() }}
-		<fieldset>
-		    <legend>Submit a solution</legend>
-		    <div>
-			{{ taskSubmitForm.code.label() }}
-			<br>
-			{{ taskSubmitForm.code(class='taskSubmitForm-control-file') }}
-			{% if taskSubmitForm.code.errors %}
-			{% for error in taskSubmitForm.code.errors %}
-			<small class="form-text text-muted">{{ error }}</small><br>
-			{% endfor %}
-			{% endif %}
-		    </div>
-		    <br>
-		    <div>
-			{{ taskSubmitForm.language.label() }}
-			{{ taskSubmitForm.language() }}
-			{% if taskSubmitForm.language.errors %}
-			{% for error in taskSubmitForm.language.errors %}
-			<small class="form-text text-muted">{{ error }}</small>
-			{% endfor %}
-			{% endif %}
-			<br>
-		    </div>
-		</fieldset>
+	<form method="POST" action="" enctype="multipart/form-data">
+	    {{ taskSubmitForm.hidden_tag() }}
+	    <fieldset>
+		<legend>Submit a solution</legend>
 		<div>
-		    {{ taskSubmitForm.submit(class='btn btn-primary') }}
+		    {{ taskSubmitForm.code.label() }}
+		    <br>
+		    {{ taskSubmitForm.code(class='taskSubmitForm-control-file') }}
+		    {% if taskSubmitForm.code.errors %}
+		    {% for error in taskSubmitForm.code.errors %}
+		    <small class="form-text text-muted">{{ error }}</small><br>
+		    {% endfor %}
+		    {% endif %}
 		</div>
-	    </form>
-	{% else %}
-	    <div>Wait for the competition to start to submit code.</div>
-	{% endif %}
+		<br>
+		<div>
+		    {{ taskSubmitForm.language.label() }}
+		    {{ taskSubmitForm.language() }}
+		    {% if taskSubmitForm.language.errors %}
+		    {% for error in taskSubmitForm.language.errors %}
+		    <small class="form-text text-muted">{{ error }}</small>
+		    {% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+	    </fieldset>
+	    <div>
+		{{ taskSubmitForm.submit(class='btn btn-primary') }}
+	    </div>
+	</form>
     {% else %}
 	<a href="{{ url_for('login') }}">Log in</a> to submit code.
     {% endif %}

@@ -3,6 +3,15 @@
     <h1>{{ competition.name }}</h1>
     <br>
     <!-- TODO dodat vrijeme -->
+    <div>
+	<strong>Start time: </strong>
+	{{ competition.start_time }}
+    </div>
+    <div>
+	<strong>End time: </strong>
+	{{ competition.end_time }}
+    </div>
+    <br>
     <table class="table">
 	<thead>
 	    <tr>
@@ -19,4 +28,7 @@
 	    {% endfor %}
 	</tbody>
     </table>
+    {% if current_user and current_user.admin %}
+	<button type="button" class="btn btn-success" onclick="location.href='/evaluate/competition/{{ competition.id }}'">Evaluate</button>
+    {% endif %}
 {% endblock content %}
