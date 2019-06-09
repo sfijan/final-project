@@ -50,6 +50,17 @@
 		    <br>
 		</div>
 		<div>
+		    {{ form.participants.label() }}
+		    <br>
+		    {{ form.participants(class='form-control') }}
+		    {% if form.participants.errors %}
+			{% for error in form.participants.errors %}
+			    <small class="form-text text-muted">{{ error }}</small>
+			{% endfor %}
+		    {% endif %}
+		    <br>
+		</div>
+		<div>
 		    {{ form.public.label() }}
 		    {{ form.public() }}
 		    {% if form.public.errors %}

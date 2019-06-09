@@ -79,6 +79,7 @@ class CompetitionAddForm(FlaskForm):
     end_time = DateTimeField('End time', validators=[DataRequired()], format="%d.%m.%Y %H:%M")
     public = BooleanField('Public:')
     tasks = NotValidatedSelectMultipleField('Tasks')#, choices=[(t.id, t.title) for t in Task.select()])
+    participants = NotValidatedSelectMultipleField('Participants')
     submit = SubmitField('Add competition')
 
     def validate_start_time(self, start_time):
@@ -92,6 +93,7 @@ class CompetitionAddForm(FlaskForm):
     def validate_name(self, name):
         if Competition.select().where(Competition.name == name.data).exists():
             raise ValidationError("Competition '" + name.data + "' already exist")
+
 
 class TaskSubmitForm(FlaskForm):
     code = FileField('Source code', validators=[DataRequired()])
