@@ -12,10 +12,11 @@ def evaluate(program, tests, language):
     #language: name of language from Language
 
     #function for running the programm
-    def run():
+    def run(q):
         submission_output = subprocess.check_output('echo -e "' + z.open(infiles[i]).read().decode() +
                                                     '" | ./selector.sh "'+language+'" '+program,
                                                     shell=True).decode()
+        q.put(submission_output)
     z = ZipFile(tests)
     infiles = []
     outfiles = []
@@ -31,9 +32,17 @@ def evaluate(program, tests, language):
                 outfiles.append(file)
 
     for i in range(len(infiles)):
-        p = multiprocessing.Process(target=run, name="Foo", args=())
+        q = multiprocessing.Queue()
+        p = multiprocessing.Process(target=run, name="task"+str(i), args=(q,))
         p.start()
         p.join(1)       #TODO make this the time limit constraint
+        try:
+            submission_output = q.get(False)
+        except:
+            result.append((infiles[i].split('/')[1], False))
+            if p.is_alive():
+                p.terminate()
+            continue
         if p.is_alive():
             p.terminate()
             p.join()
