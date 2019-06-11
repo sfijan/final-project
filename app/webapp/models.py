@@ -72,7 +72,7 @@ class Submission(BaseModel):
     code = TextField(null=True)
     competition = ForeignKeyField(column_name='competition', field='id', model=Competition, null=True)
     language = ForeignKeyField(column_name='language', field='id', model=Language)
-    result = IntegerField(null=True)
+    result = FloatField(null=True)
     task = ForeignKeyField(column_name='task_id', field='id', model=Task)
     time = DateTimeField()
     user = ForeignKeyField(column_name='user_id', field='id', model=User)
@@ -89,8 +89,7 @@ class Test(BaseModel):
         table_name = 'test'
 
 class TestResult(BaseModel):
-    points = IntegerField(null=True)
-    stderr = TextField(null=True)
+    correct = BooleanField()
     submission = ForeignKeyField(column_name='submission_id', field='id', model=Submission)
     test = ForeignKeyField(column_name='test_id', field='id', model=Test)
 
