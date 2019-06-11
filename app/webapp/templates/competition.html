@@ -12,6 +12,7 @@
 	{{ competition.end_time }}
     </div>
     <br>
+
     <table class="table">
 	<thead>
 	    <tr>
@@ -28,7 +29,14 @@
 	    {% endfor %}
 	</tbody>
     </table>
+
     {% if current_user and current_user.admin %}
-	<button type="button" class="btn btn-success" onclick="location.href='/evaluate/competition/{{ competition.id }}'">Evaluate</button>
+    <button type="button" class="btn btn-success" onclick="location.href='{{ url_for('evaluate', competition_id=competition_id) }}'">
+	Evaluate competition
+    </button>
     {% endif %}
+
+    <button type="button" class="btn btn-info" onclick="location.href='{{ url_for('competition_result', competition_id=competition.id) }}'">
+	Results
+    </button>
 {% endblock content %}

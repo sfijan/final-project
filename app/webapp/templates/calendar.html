@@ -8,6 +8,7 @@
 		<th>Name</th>
 		<th>Start time</th>
 		<th>End time</th>
+		<th>Scoreboard</th>
 	    </tr>
 	</thead>
 	<tbody>
@@ -17,6 +18,7 @@
 			<td><a href="{{ url_for('display_competition', competition_id=competition.id) }}">{{ competition.name }}</a></td>
 			<td>{{ competition.start_time }}</td>
 			<td>{{ competition.end_time }}</td>
+			<td><a href="{{ url_for('competition_result', competition_id=competition.id) }}">Results</a></td>
 		    </tr>
 		{% endif %}
 	    {% endfor %}

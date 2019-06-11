@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ competition.name }}</h1>
+    <br>
+    <table class="table">
+	<thead>
+	    <tr>
+		<th>User</th>
+		<th>Total points</th>
+	    </tr>
+	</thead>
+	<tbody>
+	    {% for result in results %}
+		<tr>
+		    <td>{{ result.user.username }}</td>
+		    <td>{{ result.sum }}</td>
+		</tr>
+	    {% endfor %}
+	</tbody>
+    </table>
+    <br>
+{% endblock content %}

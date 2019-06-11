@@ -43,4 +43,8 @@
     {% else %}
 	<a href="{{ url_for('login') }}">Log in</a> to submit code.
     {% endif %}
+    <button type="button" class="btn btn-info" onclick="location.href='/task/{{ task.id }}/result'">Results</button>
+    {% if current_user and current_user.admin %}
+	<button type="button" class="btn btn-success" onclick="location.href='/evaluate/task/{{ task.id }}'">Evaluate task</button>
+    {% endif %}
 {% endblock content %}
