@@ -1,12 +1,13 @@
 from flask import render_template, url_for, flash, redirect, request
 from webapp.forms import RegistrationForm, LoginForm, CompetitionAddForm, TaskAddForm, TaskSubmitForm
 from webapp.models import User, Competition, Task, Contains, Submission, Test, ParticipatesIn
-from webapp.evaluate import evaluate
+from webapp.evaluate import evaluate_submission
 from webapp import app, database, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import *
 import os
 from zipfile import ZipFile
+from peewee import fn
 
 
 @app.route('/')
@@ -33,17 +34,19 @@ def evaluate(competition_id=None, task_id=None):
         flash('You do not have admin privilages', 'danger')
         return redirect(url_for('display_competition', competition_id=competition_id))
 
-    #TODO the actual evaluation takes place here
     if competition_id:
         flash('The competition is being evaluated...', 'info')
-        to_evaluate = Submission.select().where(Submission.competition == competition_id)
+        to_evaluate = Submission.select().where(Submission.competition == competition_id and Submission.result == None)
     if task_id:
         flash('The task is being evaluated...', 'info')
         to_evaluate = Submission.select().where(Submission.task_id == task_id and Submission.user_id == current_user.id and Submission.result == None)
 
-    print('to evaluate:')
-    for i in to_evaluate:
-        print(i)
+    #raise Exception
+    for submission in to_evaluate:
+        result = evaluate_submission(submission.id)
+        points = result.count(True)/len(result) * Task.get(submission.task_id).maxpoints
+        submission.result = points
+        submission.save(only=[Submission.result])
 
     if competition_id:
         return redirect(url_for('display_competition', competition_id=competition_id))
@@ -117,15 +120,16 @@ def save_text(form):
     return os.path.join('static/task_text', filename)
 
 
-def save_tests(form, task_id):
-    filename = form.tests.data.filename.replace(' ', '_')
+def save_tests(form, task):
+    #filename = form.tests.data.filename.replace(' ', '_')
+    filename = task.title.replace(' ', '_') + '.zip'
     route = os.path.join(app.root_path, 'static/tests', filename)
     form.tests.data.save(route)
     #route = os.path.join('static/tests', filename)
     zip_tests = ZipFile(route)
     for file in zip_tests.namelist():
         if not (file.startswith('out/') or file.endswith('/')):
-            test = Test(task=task_id,
+            test = Test(task=task.id,
                         test_name=file.split('/')[1],
                         zip_file=route)
             test.save()
@@ -145,7 +149,7 @@ def add_task():
                     maxpoints=form.maxpoints.data,
                     public=form.public.data)
         task.save()
-        save_tests(form, task.id)
+        save_tests(form, task)
         flash('Task added seccesfully!', 'success')
         return redirect(url_for('display_task', task_id=task.id))
     return render_template('add_task.html', title='Add task', form=form)
@@ -188,6 +192,7 @@ def display_task(task_id, competition_id):
         relative_path = save_submission(taskSubmitForm, submission.id)
         submission.code = relative_path
         submission.save(only=[Submission.code])
+        flash('Submission accepted', 'success')
         #return redirect(url_for(''))
 
     if competition_id:
@@ -195,7 +200,32 @@ def display_task(task_id, competition_id):
             flash('Wait for the competition to start to view the tasks', 'danger')
             return redirect(url_for('display_competition', competition_id=competition_id))
 
-    return render_template('view_task.html', title=selected_task.title, task=selected_task, file=selected_task.text, current_user=current_user, taskSubmitForm=taskSubmitForm)#, active=active)
+    return render_template('display_task.html', title=selected_task.title, task=selected_task, file=selected_task.text, current_user=current_user, taskSubmitForm=taskSubmitForm)#, active=active)
+
+
+@app.route('/task/<task_id>/result')
+def task_result(task_id):
+    selected_task = Task.get(int(task_id))
+    if current_user:
+        results = (Submission
+                   .select()
+                   .where(Submission.user_id == current_user.id and Submission.task_id == task_id))
+    else:
+        results = Submission.select().join(User).join(Competition).where(Submission.task_id == task_id)
+
+    return render_template('task_result.html', task=selected_task, user=current_user, results=results)
+
+
+@app.route('/competition/<competition_id>/result')
+def competition_result(competition_id):
+    selected_competition = Competition.get(int(competition_id))
+    results = (Submission
+               .select(Submission.user_id, fn.SUM(Submission.result).alias('sum'))
+               .join(User)
+               .where(Submission.competition == competition_id)
+               .group_by(Submission.user_id))       #TODO add sorting
+
+    return render_template('competition_result.html', competition=selected_competition, results=results)
 
 
 @app.route('/register', methods=['GET', 'POST'])
